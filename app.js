@@ -1,53 +1,49 @@
 // load puppeteer
 const puppeteer = require('puppeteer');
-const domain = "https://www.amazon.it";
-
+const domain = "https://basicenglishspeaking.com/about";
+const request = require('request');
+const catelogy = require('./src/catelogy');
+const lesson = require('./src/lesson');
+const common = require('./src/common');
+const getSubtitles = require('youtube-captions-scraper').getSubtitles;
+const fs = require('fs');
 // IIFE
 (async () => {
   // wrapper to catch errors
   try {
-    // create a new browser instance
-    const browser = await puppeteer.launch();
-
-    // create a page inside the browser;
-    const page = await browser.newPage();
-
-    // navigate to a website and set the viewport
-    await page.setViewport({ width: 1280, height: 800 });
-    await page.goto(domain, {
-      timeout: 3000000
+    console.time();
+    // const catelogysJson = await fs.readFileSync('common/catelogy.json');
+    // const data = [];
+    // const catelogys = await catelogy.getCatelogy('https://basicenglishspeaking.com/100-common-phrases-and-sentence-patterns/');
+    // fs.writeFileSync('common/catelogy.json', JSON.stringify(catelogys));
+    // const catelogys = JSON.parse(catelogysJson);
+    // await common.recursion(catelogys, 91);
+    // for (let i = 0; i < catelogys.length; i++) {
+    //   console.log(444);
+    //   const fileName = catelogys[i].topic.split('.')[1].replace('?', '');
+    //   const commonsJSON = await fs.readFileSync(`common/${fileName.toLowerCase().replace(' ', '_')}.json`);
+    //   const commons = JSON.parse(commonsJSON);
+    //   for (let j = 0; j < commons.length; j++){
+    //     console.log(j)
+    //     data.push(commons[j]);
+    //   }
+    // }
+    // fs.writeFileSync('common/english_common.json', JSON.stringify(data));
+    // const commonJson = await fs.readFileSync('common/english_common.json');
+    // console.log(JSON.parse(commonJson).length)
+    // await common.recursion(JSON.parse(commonJson), 380);
+    getSubtitles({
+      videoID: 'ksZpu1s1LV0',
+      lang: 'us'
+    }).then(function (captions) {
+      console.log(captions);
+      console.timeEnd();
+      return;
+    }).catch(error => {
+      console.log(error);
     });
-
-    // search and wait the product list
-    await page.type('#twotabsearchtextbox', 'iphone x 64gb');
-    await page.click('input.nav-input');
-    await page.waitForSelector('.s-image');
-
-    // create a screenshots
-    await page.screenshot({path: 'search-iphone-x.png'});
-
-    const products = await page.evaluate(() => {
-      const links = Array.from(document.querySelectorAll('.s-result-item'));
-      return links.map(link => {
-        if (link.querySelector(".a-price-whole")) {
-          return {
-            name: link.querySelector(".a-size-medium.a-color-base.a-text-normal").textContent,
-            url: link.querySelector(".a-link-normal.a-text-normal").href,
-            image: link.querySelector(".s-image").src,
-            price: parseFloat(link.querySelector(".a-price-whole").textContent.replace(/[,.]/g, m => (m === ',' ? '.' : ''))),
-          };
-        }
-      }).slice(0, 5);
-    });
-
-    console.log(products.sort((a, b) => {
-      return a.price - b.price;
-    }));
-
-    // close the browser
-    await browser.close();
   } catch (error) {
     // display errors
-    console.log(error)
+    console.log(error);
   }
 })();

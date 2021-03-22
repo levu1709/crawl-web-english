@@ -19,6 +19,9 @@
   },
   "homepage": "https://github.com/eugeniosegala/puppeteer-amazon-scraping#readme",
   "dependencies": {
-    "puppeteer": "^1.18.1"
+    "puppeteer": "^1.18.1",
+    "request": "^2.88.2",
+    "uuidv4": "^6.2.6",
+    "youtube-captions-scraper": "^1.0.3"
   }
 }
